@@ -2,6 +2,7 @@ import time
 import numpy as np
 import json
 
+
 class Task:
     def __init__(self, identifier=0, size=None):
         self.identifier = identifier
@@ -18,7 +19,7 @@ class Task:
 
     def __str__(self):
         return f"Task{self.identifier}"
-    
+
     def to_json(self) -> str:
         data = {
             "identifier": self.identifier,
@@ -30,7 +31,6 @@ class Task:
         }
         return json.dumps(data)
 
-    
     @staticmethod
     def from_json(text: str) -> "Task":
         data = json.loads(text)
@@ -39,7 +39,7 @@ class Task:
         task.b = np.array(data["b"])
         task.x = np.array(data["x"])
         task.time = data["time"]
-        return task 
+        return task
 
     def __eq__(self, other: "Task") -> bool:
         if not isinstance(other, Task):

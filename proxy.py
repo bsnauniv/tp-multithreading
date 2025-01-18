@@ -10,9 +10,9 @@ from task import Task
 
 class Proxy(BaseHTTPRequestHandler):
     def __init__(self, *args, **kwargs):
-        HOST = '127.0.0.1'
+        HOST = "127.0.0.1"
         PORT = 5000
-        AUTHKEY = b'passkey'
+        AUTHKEY = b"passkey"
 
         self.client = QueueClient(HOST, PORT, AUTHKEY)
         super().__init__(*args, **kwargs)
