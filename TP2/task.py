@@ -5,12 +5,9 @@ import json
 class Task:
     def __init__(self, identifier=0, size=None):
         self.identifier = identifier
-        # choosee the size of the problem
-        self.size = size or np.random.randint(300, 3_000)
-        # Generate the input of the problem
+        self.size = size or np.random.randint(500, 3_000)
         self.a = np.random.rand(self.size, self.size)
         self.b = np.random.rand(self.size)
-        # prepare room for the results
         self.x = np.zeros((self.size))
         self.time = 0
 

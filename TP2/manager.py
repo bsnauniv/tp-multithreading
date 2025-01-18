@@ -1,12 +1,6 @@
 
 from multiprocessing.managers import BaseManager
 from multiprocessing import Queue
-import sys
-
-
-#  herite base manager
-#  ouvrie un server sur le port avec mot de passe 
-#  fourni des accesseur aux task queue et result queue 
 
 class QueueManager(BaseManager):
     pass
@@ -16,45 +10,36 @@ class QueueClient():
         self.host = host
         self.port = port
         self.authkey = authkey
+
+        BaseManager.register("task_queue")
+        QueueManager.register("result_queue")
+
+        self.manager = QueueManager(address=(self.host, self.port), authkey=self.authkey)
+        print(f"[info] Server started on {self.host}:{self.port}")
+
+        self.manager.connect()
+        print(f"[info] Connected to server on {self.host}:{self.port}")
         
-    def start_server(self, task_queue, result_queue):
-        QueueManager.register('get_task_queue', callable=lambda: task_queue)
-        QueueManager.register('get_result_queue', callable=lambda: result_queue)
-
-        manager = QueueManager(address=(self.host, self.port), authkey=self.authkey)
-        server = manager.get_server()
-        print(f"Server started on {self.host}:{self.port}")
-        server.serve_forever()
-
-    def connect_to_server(self):
-        QueueManager.register('get_task_queue')
-        QueueManager.register('get_result_queue')
-
-        manager = QueueManager(address=(self.host, self.port), authkey=self.authkey)
-        manager.connect()
-        self.task_queue = manager.get_task_queue()
-        self.result_queue = manager.get_result_queue()
-        print(f"Connected to server on {self.host}:{self.port}")
-
-
-
-#  Queue Client 
-
-#  travail se connecter aux serveurs partage port et mdp avec Queue MAneger
-# lance serveur ouvre port et on attend
-
+        self.task_queue = self.manager.task_queue()
+        self.result_queue = self.manager.result_queue()
+        
 if __name__ == "__main__":
-    
-
     HOST = '127.0.0.1'
     PORT = 5000
-    AUTHKEY = b'secret'
+    AUTHKEY = b'passkey'
+
+    print(f"[info] Starting manager")
 
     task_queue = Queue()
     result_queue = Queue()
-    server = QueueClient(HOST, PORT, AUTHKEY)
-    print("[info] Starting server...")
-    server.start_server(task_queue, result_queue)
+
+    manager = QueueManager(address=(HOST, PORT), authkey=AUTHKEY)
+
+    QueueManager.register("task_queue", callable=lambda: task_queue)
+    QueueManager.register("result_queue", callable=lambda: result_queue)
+
+    server = manager.get_server()
+    server.serve_forever()
 
     
     
